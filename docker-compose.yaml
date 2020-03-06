@@ -1,0 +1,123 @@
+---
+version: '2'
+services:
+  ansi-contorlnode:
+    image: confluent/zookeeper:latest
+    hostname: ansi-contorlnode
+    ports:
+      - "12181:12181"
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 12181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: ansi-contorlnode:12888:13888;ansi-client:22888:23888;ansi-client2:32888:33888
+    network_mode: host
+    extra_hosts:
+      - "moby:127.0.0.1"
+    volumes:
+      - /opt/data/zookeeper:/opt/zookeeper-3.4.6/data
+      - /opt/data/zookeeper-log:/opt/zookeeper-3.4.6/log
+
+  ansi-client:
+    image: confluent/zookeeper:latest
+    hostname: ansi-client
+    ports:
+      - "22181:22181"
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 22181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: ansi-contorlnode:12888:13888;ansi-client:22888:23888;ansi-client2:32888:33888
+    network_mode: host
+    extra_hosts:
+      - "moby:127.0.0.1"
+    volumes:
+      - /opt/data/zookeeper:/opt/zookeeper-3.4.6/data
+      - /opt/data/zookeeper-log:/opt/zookeeper-3.4.6/log
+
+  ansi-client2:
+    image: confluent/zookeeper:latest
+    hostname: ansi-client2
+    ports:
+      - "32181:32181"
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 32181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: ansi-contorlnode:12888:13888;ansi-client:22888:23888;ansi-client2:32888:33888
+    network_mode: host
+    extra_hosts:
+      - "moby:127.0.0.1"
+    volumes:
+      - /opt/data/zookeeper:/opt/zookeeper-3.4.6/data
+      - /opt/data/zookeeper-log:/opt/zookeeper-3.4.6/log
+
+  ansi-client3:
+    image: confluent/kafka:latest
+    hostname: ansi-client3
+    ports:
+      - "19092:19092"
+    depends_on:
+      - ansi-contorlnode
+      - ansi-client
+      - ansi-client2
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: ansi-contorlnode:12181,ansi-client:12181,ansi-client2:12181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://ansi-client3:19092
+      KAFKA_LOG_RETENTION_BYTES: -1
+      KAFKA_LOG_RETENTION_DAYS: 2
+      KAFKA_LOG_DIRS: /kafka/kafka-logs
+    extra_hosts:
+      - "moby:127.0.0.1"
+    volumes:
+      - /opt/data/kafka:/kafka/kafka-logs
+
+  ansi-client4:
+    image: confluent/kafka:latest
+    hostname: ansi-client4
+    ports:
+      - "29092:29092"
+    depends_on:
+      - ansi-contorlnode
+      - ansi-client
+      - ansi-client2
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: ansi-contorlnode:12181,ansi-client:12181,ansi-client2:12181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://ansi-client4:29092
+      KAFKA_LOG_RETENTION_BYTES: -1
+      KAFKA_LOG_RETENTION_DAYS: 2
+      KAFKA_LOG_DIRS: /kafka/kafka-logs
+    extra_hosts:
+      - "moby:127.0.0.1"
+    volumes:
+      - /opt/data/kafka:/kafka/kafka-logs
+      
+  ansi-client5:
+    image: confluent/kafka:latest
+    hostname: ansi-client5
+    ports:
+      - "39092:39092"
+    depends_on:
+      - ansi-contorlnode
+      - ansi-client
+      - ansi-client2
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: ansi-contorlnode:12181,ansi-client:12181,ansi-client2:12181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://ansi-client5:39092
+      KAFKA_LOG_RETENTION_BYTES: -1
+      KAFKA_LOG_RETENTION_DAYS: 2
+      KAFKA_LOG_DIRS: /kafka/kafka-logs
+    extra_hosts:
+      - "moby:127.0.0.1"
+    volumes:
+      - /opt/data/kafka:/kafka/kafka-logs
+
